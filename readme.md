@@ -28,7 +28,7 @@ pip freeze > requirements.txt
 
 ## requirments로부터 install
 ```bash
-pip install -r 파일이름.txt
+pip install -r requirements.txt
 ```
 
 # 가상환경 개발 프로세스

@@ -4,7 +4,8 @@ import json
 # 예제 JSON 데이터
 data = {
     "name": "yeong nam",
-    "phone": "+1234567890"
+    "phone": "+1234567890",
+    "ID" : "1234"
 }
 
 # JSON 데이터를 문자열로 변환

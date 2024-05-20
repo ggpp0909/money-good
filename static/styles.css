@@ -1,0 +1,27 @@
+body {
+    background-color: #178765;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    cursor: default;
+}
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 100px;
+}
+.text-block-1 {
+    font-size: 100px;
+    font-weight: bold;
+    color: white;
+}
+
+.text-block-2 {
+    font-size: 60px;
+    font-weight: 300;
+    color: #dddddd;
+}

@@ -16,15 +16,14 @@
         #reader {
             width: 500px;
             margin: auto;
-            display: none; /* 초기에는 숨김 처리 */
         }
-        #initial-screen {
+        #qr-screen {
             width: 50vw;
             height: 50vh;
             background-color: #E8F5E9; /* 연녹색 배경 */
             border: 2px solid #4CAF50; /* 초록색 테두리 */
             border-radius: 10px;
-            display: flex;
+            display: none; /* 초기에는 숨김 처리 */
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -61,16 +60,7 @@
     </style>
 </head>
 <body>
-    <div id="initial-screen">
-        <div class="text-block-2">
-            <div>user id 본인 확인</div>
-        </div>
-        <div class="buttons">
-            <button class="btn" onclick="showQrScanner()">확인</button>
-            <button class="btn" onclick="cancel()">취소</button>
-        </div>
-    </div>
-    <div id="qr-screen" class="hidden">
+    <div id="qr-screen">
         <div class="text-block-2">
             <div>QR code를</div>
             <div>스캔해주세요.</div>
@@ -78,14 +68,29 @@
         <div id="reader"></div>
         <button class="btn" onclick="cancel()">취소</button>
     </div>
+    <div id="initial-screen" class="hidden">
+        <div class="text-block-2">
+            <div>user id 본인 확인</div>
+            <div id="user-data"></div> <!-- 유저 정보를 표시할 곳 -->
+        </div>
+        <div class="buttons">
+            <button class="btn" onclick="confirmData()">확인</button>
+            <button class="btn" onclick="cancel()">취소</button>
+        </div>
+    </div>
     <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 초기에 QR 코드 스캔 화면 보여주기
+            showQrScanner();
+        });
+
         function showQrScanner() {
+            // QR 스캔 화면 표시
+            document.getElementById('qr-screen').style.display = 'flex';
+
             // 초기 화면 숨기기
             document.getElementById('initial-screen').style.display = 'none';
-            // QR 스캔 화면 표시
-            document.getElementById('qr-screen').classList.remove('hidden');
-            document.getElementById('reader').style.display = 'block';
 
             // QR 코드 스캔 시작
             const html5QrCode = new Html5Qrcode("reader");
@@ -111,33 +116,39 @@
             // Handle scan error
             console.log(`Error: ${errorMessage}`);
         }
+
         function onScanSuccess(decodedText, decodedResult) {
             // Handle the decoded text
             try {
                 const jsonData = JSON.parse(decodedText);
-                sendToServer(jsonData);
+                displayUserData(jsonData);
+                // 데이터가 읽히면 초기 화면을 보여줌
+                showInitialScreen();
             } catch (e) {
                 console.error("Invalid JSON", e);
             }
         }
 
-        function sendToServer(data) {
-            fetch("/process_qr", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log("Success:", result);
-                alert("QR Code processed successfully.");
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-}
+        function showInitialScreen() {
+            // QR 스캔 화면 숨기기
+            document.getElementById('qr-screen').style.display = 'none';
+
+            // 초기 화면 표시
+            document.getElementById('initial-screen').style.display = 'flex';
+        }
+
+        function displayUserData(data) {
+            const userDataElement = document.getElementById('user-data');
+            userDataElement.innerHTML = `
+                <div>이름: ${data.name}</div>
+                <div>전화번호: ${data.phone}</div>
+                <div>ID: ${data.ID}</div>
+            `;
+        }
+
+        function confirmData() {
+            window.location.href = "{{ url_for('main_menu') }}";
+        }
     </script>
 </body>
 </html>

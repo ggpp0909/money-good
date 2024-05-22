@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OIL COLLECTOR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #E8F5E9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        .message {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .btn {
+            background-color: #178765;
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+        .btn:hover {
+            background-color: #145a54;
+        }
+        .hidden {
+            display: none;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #178765;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="initial-screen" class="container">
+        <div class="message">
+            <div>열린 투입구로</div>
+            <div>폐식용유를 부어주세요.</div>
+        </div>
+        <button class="btn" onclick="handleLidClose()">투입구 닫기</button>
+    </div>
+
+    <div id="result-screen" class="container hidden">
+        <div class="message" id="oil-amount-message"></div>
+        <div class="buttons">
+            <button class="btn" onclick="handleMeasureAgain()">다시 측정</button>
+            <button class="btn" onclick="handleConfirm()">확인</button>
+        </div>
+    </div>
+
+    <div id="history-screen" class="container hidden">
+        <div class="message" id="total-amount-message"></div>
+        <div class="buttons">
+            <button class="btn" onclick="redirectToHistory()">수거내역 확인하기</button>
+            <button class="btn" onclick="window.location.href='/'">나가기(로그아웃)</button>
+        </div>
+    </div>
+
+    <div id="loading-screen" class="container hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        function handleLidClose() {
+            showLoading();
+            setTimeout(() => {
+                const oilAmount = "X"; // 실제 로직으로 대체
+                document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
+                hideLoading();
+                document.getElementById('result-screen').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function handleMeasureAgain() {
+            showLoading();
+            setTimeout(() => {
+                const oilAmount = "X"; // 실제 로직으로 대체
+                document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
+                hideLoading();
+                document.getElementById('result-screen').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function handleConfirm() {
+            alert("확인합니다.");
+            document.getElementById('result-screen').classList.add('hidden');
+            showLoading();
+            setTimeout(() => {
+                const totalAmount = "X"; // 실제 로직으로 대체
+                document.getElementById('total-amount-message').textContent = `현재 측정된 폐식용유는 ${totalAmount} (L)입니다.`;
+                hideLoading();
+                document.getElementById('history-screen').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading-screen').classList.remove('hidden');
+            document.getElementById('initial-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('history-screen').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-screen').classList.add('hidden');
+        }
+
+        function redirectToHistory() {
+            window.location.href = "{{ url_for('history') }}";
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('initial-screen').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>

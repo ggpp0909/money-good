@@ -80,6 +80,8 @@
     </div>
     <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
     <script>
+        let html5QrCode;
+
         document.addEventListener('DOMContentLoaded', function() {
             // 초기에 QR 코드 스캔 화면 보여주기
             showQrScanner();
@@ -93,7 +95,7 @@
             document.getElementById('initial-screen').style.display = 'none';
 
             // QR 코드 스캔 시작
-            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start(
                 { facingMode: "environment" }, // camera facing mode
                 {
@@ -124,6 +126,14 @@
                 displayUserData(jsonData);
                 // 데이터가 읽히면 초기 화면을 보여줌
                 showInitialScreen();
+                // QR 코드 스캔 중지
+                html5QrCode.stop().then(ignore => {
+                    // QR Code scanning is stopped.
+                    console.log("QR Code scanning stopped.");
+                }).catch(err => {
+                    // Stop failed, handle it.
+                    console.error(`Unable to stop scanning, error: ${err}`);
+                });
             } catch (e) {
                 console.error("Invalid JSON", e);
             }
@@ -147,7 +157,29 @@
         }
 
         function confirmData() {
-            window.location.href = "{{ url_for('main_menu') }}";
+            const userDataElement = document.getElementById('user-data');
+            const name = userDataElement.querySelector('div:nth-child(1)').textContent.split(': ')[1];
+            const phone = userDataElement.querySelector('div:nth-child(2)').textContent.split(': ')[1];
+            const userId = userDataElement.querySelector('div:nth-child(3)').textContent.split(': ')[1];
+
+            const data = { name, phone, ID: userId };
+
+            fetch("/process_qr", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log("Success:", result);
+                alert("User data processed successfully.");
+                window.location.href = "{{ url_for('main_menu') }}";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
         }
     </script>
 </body>

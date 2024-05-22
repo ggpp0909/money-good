@@ -3,10 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OIL COLLECTOR</title>
+    <title>History</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #E8F5E9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            height: 80%;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 1.5rem;
+            color: #333;
+        }
+        .arrow {
+            cursor: pointer;
+            font-size: 1.5rem;
+            margin: 0 10px;
+            color: #333;
+        }
+        .history-list {
+            width: 100%;
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            user-select: none; /* Prevent text selection */
+            cursor: grab; /* Change cursor to indicate dragging */
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .btn {
+            background-color: #178765;
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+            width: 100%;
+            text-align: center;
+        }
+        .btn:hover {
+            background-color: #145a54;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <div class="arrow" onclick="changeMonth(-1)">&#8592;</div>
+            <div class="title" id="title">User ID의 5월 수거 내역</div>
+            <div class="arrow" onclick="changeMonth(1)">&#8594;</div>
+        </div>
+        <div class="history-list" id="history-list">
+            <!-- 수거 기록이 여기에 표시됩니다 -->
+        </div>
+        <button class="btn" onclick="window.location.href='/dispose_oil'">폐 식용유 버리기</button>
+        <button class="btn" onclick="window.location.href='/'">나가기</button>
+    </div>
 
+    <script>
+        const userId = "User ID"; // 실제 사용자 ID로 변경 필요
+        let currentDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTitle();
+            fetchHistory();
+        });
+
+        function updateTitle() {
+            const month = currentDate.getMonth() + 1; // 월은 0부터 시작하므로 +1
+            const title = `${userId}의 ${month}월 수거 내역`;
+            document.getElementById('title').textContent = title;
+        }
+
+        function changeMonth(offset) {
+            currentDate.setMonth(currentDate.getMonth() + offset);
+            updateTitle();
+            fetchHistory();
+        }
+
+        function fetchHistory() {
+            // 여기에서 DB에서 해당 월의 수거 내역을 가져오는 AJAX 요청을 추가
+            // 예시로 임의의 데이터를 사용
+            const historyList = [
+                { date: '2024.05.01(월)', amount: '2' },
+                { date: '2024.05.02(화)', amount: '1' },
+                { date: '2024.05.03(수)', amount: '1.5' },
+                { date: '2024.05.04(목)', amount: '2' },
+                { date: '2024.05.05(금)', amount: '2.5' },
+                { date: '2024.05.06(토)', amount: '3' },
+                { date: '2024.05.07(일)', amount: '1' },
+                { date: '2024.05.08(월)', amount: '1.2' },
+                { date: '2024.05.09(화)', amount: '1.8' },
+                { date: '2024.05.10(수)', amount: '2.1' },
+                { date: '2024.05.11(목)', amount: '2.4' },
+                { date: '2024.05.12(금)', amount: '2.7' },
+                { date: '2024.05.13(토)', amount: '3.0' },
+                { date: '2024.05.14(일)', amount: '3.2' },
+                { date: '2024.05.15(월)', amount: '3.5' }
+            ];
+
+            displayHistory(historyList);
+        }
+
+        function displayHistory(historyList) {
+            const historyContainer = document.getElementById('history-list');
+            historyContainer.innerHTML = '';
+
+            historyList.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `<div>${item.date}</div><div>${item.amount} (L)</div>`;
+                historyContainer.appendChild(historyItem);
+            });
+        }
+
+        // 드래그로 스크롤 기능 추가
+        let isDown = false;
+        let startY;
+        let scrollTop;
+
+        const slider = document.querySelector('.history-list');
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.classList.add('active');
+            slider.style.cursor = 'grabbing'; // Change cursor to grabbing
+            startY = e.pageY - slider.offsetTop;
+            scrollTop = slider.scrollTop;
+            e.preventDefault(); // Prevent text selection
+        });
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.classList.remove('active');
+            slider.style.cursor = 'grab'; // Change cursor back to grab
+        });
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.classList.remove('active');
+            slider.style.cursor = 'grab'; // Change cursor back to grab
+        });
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const y = e.pageY - slider.offsetTop;
+            const walk = (y - startY) * 2; // 스크롤 속도
+            slider.scrollTop = scrollTop - walk;
+        });
+    </script>
 </body>
 </html>

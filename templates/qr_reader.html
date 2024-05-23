@@ -17,24 +17,31 @@
             width: 500px;
             margin: auto;
         }
-        #qr-screen {
-            width: 50vw;
-            height: 50vh;
-            background-color: #E8F5E9; /* 연녹색 배경 */
-            border: 2px solid #4CAF50; /* 초록색 테두리 */
+        #qr-screen, #initial-screen {
+            width: 600px; /* 고정된 너비 */
+            height: 600px; /* 고정된 높이 */
+            background-color: #E8F5E9;
+            border: 2px solid #4CAF50;
             border-radius: 10px;
-            display: none; /* 초기에는 숨김 처리 */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
             font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #qr-screen {
+            display: flex;
         }
         .text-block-2 {
-            font-size: 1.5rem;
+            font-size: 2.5rem; /* 글자 크기 확대 */
             color: #333;
             margin-bottom: 20px;
+        }
+        .upper-text {
+            margin-bottom: 60px;
         }
         .buttons {
             display: flex;
@@ -44,12 +51,13 @@
         .btn {
             background-color: #178765;
             color: white;
-            font-size: 1rem;
-            padding: 10px 20px;
+            font-size: 1.5rem; /* 버튼 글자 크기 확대 */
+            padding: 15px 30px; /* 버튼 크기 확대 */
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-top: 20px; /* 마진 추가 */
         }
         .btn:hover {
             background-color: #145a54;
@@ -57,56 +65,80 @@
         .hidden {
             display: none;
         }
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #4CAF50;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+ 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div id="qr-screen">
         <div class="text-block-2">
-            <div>QR code를</div>
-            <div>스캔해주세요.</div>
+            <div>QR code를 스캔해주세요.</div>
         </div>
         <div id="reader"></div>
-        <button class="btn" onclick="cancel()">취소</button>
+        <div class="loader-container">
+            <div class="loader" id="loader"></div>
+        </div>
+        <button class="btn" onclick="cancel()">나가기</button> <!-- 버튼 텍스트 변경 및 크기 확대 -->
     </div>
     <div id="initial-screen" class="hidden">
         <div class="text-block-2">
-            <div>user id 본인 확인</div>
+            <div class="upper-text">user id 본인 확인</div>
             <div id="user-data"></div> <!-- 유저 정보를 표시할 곳 -->
         </div>
         <div class="buttons">
             <button class="btn" onclick="confirmData()">확인</button>
-            <button class="btn" onclick="cancel()">취소</button>
+            <button class="btn" onclick="cancel()">나가기</button> <!-- 버튼 텍스트 변경 및 크기 확대 -->
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
     <script>
         let html5QrCode;
+        let scannedData = null;  // QR 코드 스캔 데이터를 저장할 전역 변수
 
         document.addEventListener('DOMContentLoaded', function() {
-            // 초기에 QR 코드 스캔 화면 보여주기
             showQrScanner();
         });
 
         function showQrScanner() {
-            // QR 스캔 화면 표시
             document.getElementById('qr-screen').style.display = 'flex';
-
-            // 초기 화면 숨기기
             document.getElementById('initial-screen').style.display = 'none';
 
-            // QR 코드 스캔 시작
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('reader').style.display = 'block';
+
             html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start(
-                { facingMode: "environment" }, // camera facing mode
+                { facingMode: "environment" },
                 {
-                    fps: 10, // frames per second
-                    qrbox: 250 // scanning box width
+                    fps: 10,
+                    qrbox: 250
                 },
                 onScanSuccess,
                 onScanError
-            ).catch(err => {
-                // Start failed, handle it.
+            ).then(() => {
+                document.getElementById('loader').style.display = 'none';
+            }).catch(err => {
                 console.error(`Unable to start scanning, error: ${err}`);
+                document.getElementById('loader').style.display = 'none';
+                alert("카메라를 시작할 수 없습니다: " + err);
             });
         }
 
@@ -115,23 +147,18 @@
         }
 
         function onScanError(errorMessage) {
-            // Handle scan error
             console.log(`Error: ${errorMessage}`);
         }
 
         function onScanSuccess(decodedText, decodedResult) {
-            // Handle the decoded text
             try {
                 const jsonData = JSON.parse(decodedText);
+                scannedData = jsonData;  // QR 코드 스캔 데이터를 전역 변수에 저장
                 displayUserData(jsonData);
-                // 데이터가 읽히면 초기 화면을 보여줌
                 showInitialScreen();
-                // QR 코드 스캔 중지
                 html5QrCode.stop().then(ignore => {
-                    // QR Code scanning is stopped.
                     console.log("QR Code scanning stopped.");
                 }).catch(err => {
-                    // Stop failed, handle it.
                     console.error(`Unable to stop scanning, error: ${err}`);
                 });
             } catch (e) {
@@ -140,10 +167,7 @@
         }
 
         function showInitialScreen() {
-            // QR 스캔 화면 숨기기
             document.getElementById('qr-screen').style.display = 'none';
-
-            // 초기 화면 표시
             document.getElementById('initial-screen').style.display = 'flex';
         }
 
@@ -151,35 +175,16 @@
             const userDataElement = document.getElementById('user-data');
             userDataElement.innerHTML = `
                 <div>이름: ${data.name}</div>
-                <div>전화번호: ${data.phone}</div>
-                <div>ID: ${data.ID}</div>
             `;
         }
 
         function confirmData() {
-            const userDataElement = document.getElementById('user-data');
-            const name = userDataElement.querySelector('div:nth-child(1)').textContent.split(': ')[1];
-            const phone = userDataElement.querySelector('div:nth-child(2)').textContent.split(': ')[1];
-            const userId = userDataElement.querySelector('div:nth-child(3)').textContent.split(': ')[1];
-
-            const data = { name, phone, ID: userId };
-
-            fetch("/process_qr", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log("Success:", result);
-                alert("User data processed successfully.");
-                window.location.href = "{{ url_for('main_menu') }}";
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
+            if (scannedData) {
+                const queryString = `?name=${encodeURIComponent(scannedData.name)}&phone=${encodeURIComponent(scannedData.phone)}&ID=${encodeURIComponent(scannedData.ID)}`;
+                window.location.href = "/main_menu" + queryString;
+            } else {
+                alert("No data scanned.");
+            }
         }
     </script>
 </body>

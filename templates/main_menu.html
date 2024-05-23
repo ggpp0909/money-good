@@ -45,11 +45,29 @@
             background-color: #145a54;
         }
     </style>
+    <script>
+        // URL 파라미터 읽기
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                name: params.get('name'),
+                phone: params.get('phone'),
+                id: params.get('id')
+            };
+        }
+
+        // 페이지 이동
+        function navigateTo(page) {
+            const params = getUrlParams();
+            const queryString = `?name=${encodeURIComponent(params.name)}&phone=${encodeURIComponent(params.phone)}&id=${encodeURIComponent(params.id)}`;
+            window.location.href = page + queryString;
+        }
+    </script>
 </head>
 <body>
     <div class="container">
-        <button class="btn" onclick="window.location.href='/dispose_oil'">폐식용유 버리기</button>
-        <button class="btn" onclick="window.location.href='/view_records'">수거내역 확인하기</button>
+        <button class="btn" onclick="navigateTo('/dispose_oil')">폐식용유 버리기</button>
+        <button class="btn" onclick="navigateTo('/history')">수거내역 확인하기</button>
         <button class="btn" onclick="window.location.href='/'">나가기</button>
     </div>
 </body>

@@ -121,8 +121,9 @@
             document.getElementById('result-screen').classList.add('hidden');
             showLoading();
             setTimeout(() => {
+                // Ajax로 5월 누적 식용유 받아오기
                 const totalAmount = "X"; // 실제 로직으로 대체
-                document.getElementById('total-amount-message').textContent = `현재 측정된 폐식용유는 ${totalAmount} (L)입니다.`;
+                document.getElementById('total-amount-message').textContent = `5월 누적 폐식용유는 ${totalAmount} (L)입니다.`;
                 hideLoading();
                 document.getElementById('history-screen').classList.remove('hidden');
             }, 1000);

@@ -80,18 +80,18 @@
     <div class="container">
         <div class="header">
             <div class="arrow" onclick="changeMonth(-1)">&#8592;</div>
-            <div class="title" id="title">User ID의 5월 수거 내역</div>
+            <div class="title" id="title"></div>
             <div class="arrow" onclick="changeMonth(1)">&#8594;</div>
         </div>
         <div class="history-list" id="history-list">
             <!-- 수거 기록이 여기에 표시됩니다 -->
         </div>
-        <button class="btn" onclick="window.location.href='/dispose_oil'">폐 식용유 버리기</button>
+        <button class="btn" onclick="navigateTo('/dispose_oil')">폐 식용유 버리기</button>
         <button class="btn" onclick="window.location.href='/'">나가기</button>
     </div>
 
     <script>
-        const userId = "User ID"; // 실제 사용자 ID로 변경 필요
+        const params = getUrlParams();
         let currentDate = new Date();
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -99,9 +99,26 @@
             fetchHistory();
         });
 
+        // URL 파라미터 읽기
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                name: params.get('name'),
+                phone: params.get('phone'),
+                id: params.get('id')
+            };
+        }
+
+        // 페이지 이동
+        function navigateTo(page) {
+            const params = getUrlParams();
+            const queryString = `?name=${encodeURIComponent(params.name)}&phone=${encodeURIComponent(params.phone)}&id=${encodeURIComponent(params.id)}`;
+            window.location.href = page + queryString;
+        }
+
         function updateTitle() {
             const month = currentDate.getMonth() + 1; // 월은 0부터 시작하므로 +1
-            const title = `${userId}의 ${month}월 수거 내역`;
+            const title = `${params.name} 님의 ${month}월 수거 내역`;
             document.getElementById('title').textContent = title;
         }
 

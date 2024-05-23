@@ -29,15 +29,24 @@ def qr_reader():
 
 @app.route('/main_menu')
 def main_menu():
-    return render_template('main_menu.html')
+    name = request.args.get('name')
+    phone = request.args.get('phone')
+    user_id = request.args.get('ID')
+    return render_template('main_menu.html', name=name, phone=phone, user_id=user_id)
 
 @app.route('/dispose_oil')
 def dispose_oil():
-    return render_template('dispose_oil.html')
+    name = request.args.get('name')
+    phone = request.args.get('phone')
+    user_id = request.args.get('id')
+    return render_template('dispose_oil.html', name=name, phone=phone, user_id=user_id)
 
 @app.route('/history')
 def history():
-    return render_template('history.html')
+    name = request.args.get('name')
+    phone = request.args.get('phone')
+    user_id = request.args.get('id')
+    return render_template('history.html', name=name, phone=phone, user_id=user_id)
 
 @app.route('/view_records')
 def view_records():

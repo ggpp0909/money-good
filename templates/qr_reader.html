@@ -17,17 +17,16 @@
             width: 500px;
             margin: auto;
         }
+        #user-data {
+            font-size: 3;
+        }
         #qr-screen, #initial-screen {
             width: 680px; /* 고정된 너비 */
-            height: 620px; /* 고정된 높이 */
-            background-color: #E8F5E9;
-            border: 2px solid #4CAF50;
-            border-radius: 10px;
+            height: 650px; /* 고정된 높이 */
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
             font-family: Arial, sans-serif;
             padding: 20px;
@@ -40,14 +39,15 @@
         }
         .text-block-2 {
             font-size: 2.5rem; /* 글자 크기 확대 */
-            color: #333;
+            color: #dddddd;
             margin-top: 20px;
             margin-bottom: 20px;
             font-family: Arial, sans-serif;
             font-weight: bold;
         }
         .upper-text {
-            margin-bottom: 160px;
+            margin-top: 60px;
+            margin-bottom: 130px;
         }
         .buttons {
             display: flex;
@@ -60,10 +60,10 @@
             font-size: 1.5rem; /* 버튼 글자 크기 확대 */
             font-weight: bold;
             padding: 30px 220px; /* 버튼 크기 확대 */
-            border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            border: 2px solid #c0e1d7;
             margin: 30px 0; /* 마진 추가 */
             :hover {
                 background-color: #145a54;
@@ -72,10 +72,11 @@
         .btn2 {
             background-color: #178765;
             color: white;
+            border: 2px solid #c0e1d7;
             font-size: 1.5rem; /* 버튼 글자 크기 확대 */
+            font-weight: bold;
             width: 240px;
             padding: 30px 50px; /* 버튼 크기 확대 */
-            border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
@@ -106,6 +107,9 @@
         .result-text {
             margin-top: 20px;
         }
+        .user-name {
+            font-size: 3rem;
+        }
  
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -122,11 +126,11 @@
         <div class="loader-container">
             <div class="loader" id="loader"></div>
         </div>
-        <button class="btn1" onclick="cancel()">나가기</button> <!-- 버튼 텍스트 변경 및 크기 확대 -->
+        <button class="btn1" onclick="cancel()">취소</button> <!-- 버튼 텍스트 변경 및 크기 확대 -->
     </div>
     <div id="initial-screen" class="hidden">
         <div class="text-block-2 result-text">
-            <div class="upper-text">user id 본인 확인</div>
+            <div class="upper-text">본인 확인</div>
             <div id="user-data"></div> <!-- 유저 정보를 표시할 곳 -->
         </div>
         <div class="buttons">
@@ -200,7 +204,7 @@
         function displayUserData(data) {
             const userDataElement = document.getElementById('user-data');
             userDataElement.innerHTML = `
-                <div>${data.name}</div>
+                <div class="user-name">${data.name}</div>
             `;
         }
 

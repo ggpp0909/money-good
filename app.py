@@ -1,9 +1,12 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify, g
+from excel import append_to_excel, calculate_total_monthly_amount
 import sqlite3
 from datetime import datetime
+import openpyxl
 
 app = Flask(__name__)
 DATABASE = 'database.db'
+FILE_PATH = 'data.xlsx'
 cur_user = None
 
 def get_db():
@@ -40,6 +43,39 @@ def dispose_oil():
     phone = request.args.get('phone')
     user_id = request.args.get('id')
     return render_template('dispose_oil.html', name=name, phone=phone, user_id=user_id)
+
+@app.route('/save_to_excel')
+def save_to_excel():
+    name = request.args.get('name')
+    phone = request.args.get('phone')
+    user_id = request.args.get('id')
+    oil_amount = request.args.get('amount')
+    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    place = "Unknown"  # Place can be added dynamically if needed
+
+    append_to_excel(name, phone, user_id, time, place, oil_amount, FILE_PATH)
+    current_month = datetime.now().month
+    total_amount = calculate_total_monthly_amount(user_id, current_month, FILE_PATH)
+    return jsonify(totalAmount=total_amount)
+
+@app.route('/fetch_history')
+def fetch_history():
+    user_id = request.args.get('id')
+    month = int(request.args.get('month'))
+    try:
+        wb = openpyxl.load_workbook(FILE_PATH)
+        sheet = wb.active
+        history = []
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            record_id, name, phone, oil_amount, place, record_time = row
+            if record_id == user_id and datetime.strptime(record_time, "%Y-%m-%d %H:%M:%S").month == month:
+                history.append({
+                    "date": datetime.strptime(record_time, "%Y-%m-%d %H:%M:%S").strftime("%Y.%m.%d(%a)"),
+                    "amount": oil_amount
+                })
+        return jsonify(history)
+    except FileNotFoundError:
+        return jsonify([])   
 
 @app.route('/history')
 def history():

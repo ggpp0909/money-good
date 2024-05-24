@@ -111,7 +111,6 @@
 
         // 페이지 이동
         function navigateTo(page) {
-            const params = getUrlParams();
             const queryString = `?name=${encodeURIComponent(params.name)}&phone=${encodeURIComponent(params.phone)}&id=${encodeURIComponent(params.id)}`;
             window.location.href = page + queryString;
         }
@@ -129,27 +128,15 @@
         }
 
         function fetchHistory() {
-            // 여기에서 DB에서 해당 월의 수거 내역을 가져오는 AJAX 요청을 추가
-            // 예시로 임의의 데이터를 사용
-            const historyList = [
-                { date: '2024.05.01(월)', amount: '2' },
-                { date: '2024.05.02(화)', amount: '1' },
-                { date: '2024.05.03(수)', amount: '1.5' },
-                { date: '2024.05.04(목)', amount: '2' },
-                { date: '2024.05.05(금)', amount: '2.5' },
-                { date: '2024.05.06(토)', amount: '3' },
-                { date: '2024.05.07(일)', amount: '1' },
-                { date: '2024.05.08(월)', amount: '1.2' },
-                { date: '2024.05.09(화)', amount: '1.8' },
-                { date: '2024.05.10(수)', amount: '2.1' },
-                { date: '2024.05.11(목)', amount: '2.4' },
-                { date: '2024.05.12(금)', amount: '2.7' },
-                { date: '2024.05.13(토)', amount: '3.0' },
-                { date: '2024.05.14(일)', amount: '3.2' },
-                { date: '2024.05.15(월)', amount: '3.5' }
-            ];
-
-            displayHistory(historyList);
+            const queryString = `?id=${encodeURIComponent(params.id)}&month=${currentDate.getMonth() + 1}`;
+            fetch(`/fetch_history${queryString}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayHistory(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching history:', error);
+                });
         }
 
         function displayHistory(historyList) {

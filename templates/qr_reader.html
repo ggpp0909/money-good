@@ -18,8 +18,8 @@
             margin: auto;
         }
         #qr-screen, #initial-screen {
-            width: 600px; /* 고정된 너비 */
-            height: 600px; /* 고정된 높이 */
+            width: 680px; /* 고정된 너비 */
+            height: 620px; /* 고정된 높이 */
             background-color: #E8F5E9;
             border: 2px solid #4CAF50;
             border-radius: 10px;
@@ -32,36 +32,59 @@
             font-family: Arial, sans-serif;
             padding: 20px;
         }
+        #initial-screen {
+            justify-content: space-between;
+        }
         #qr-screen {
             display: flex;
         }
         .text-block-2 {
             font-size: 2.5rem; /* 글자 크기 확대 */
             color: #333;
+            margin-top: 20px;
             margin-bottom: 20px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
         }
         .upper-text {
-            margin-bottom: 60px;
+            margin-bottom: 160px;
         }
         .buttons {
             display: flex;
             justify-content: center;
             gap: 20px;
         }
-        .btn {
+        .btn1 {
             background-color: #178765;
             color: white;
             font-size: 1.5rem; /* 버튼 글자 크기 확대 */
-            padding: 15px 30px; /* 버튼 크기 확대 */
+            font-weight: bold;
+            padding: 30px 220px; /* 버튼 크기 확대 */
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 20px; /* 마진 추가 */
+            margin: 30px 0; /* 마진 추가 */
+            :hover {
+                background-color: #145a54;
+            }
         }
-        .btn:hover {
-            background-color: #145a54;
+        .btn2 {
+            background-color: #178765;
+            color: white;
+            font-size: 1.5rem; /* 버튼 글자 크기 확대 */
+            width: 240px;
+            padding: 30px 50px; /* 버튼 크기 확대 */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 30px 0; /* 마진 추가 */
+            :hover {
+                background-color: #145a54;
+            }
         }
+
         .hidden {
             display: none;
         }
@@ -80,6 +103,9 @@
             height: 50px;
             animation: spin 2s linear infinite;
         }
+        .result-text {
+            margin-top: 20px;
+        }
  
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -96,16 +122,16 @@
         <div class="loader-container">
             <div class="loader" id="loader"></div>
         </div>
-        <button class="btn" onclick="cancel()">나가기</button> <!-- 버튼 텍스트 변경 및 크기 확대 -->
+        <button class="btn1" onclick="cancel()">나가기</button> <!-- 버튼 텍스트 변경 및 크기 확대 -->
     </div>
     <div id="initial-screen" class="hidden">
-        <div class="text-block-2">
+        <div class="text-block-2 result-text">
             <div class="upper-text">user id 본인 확인</div>
             <div id="user-data"></div> <!-- 유저 정보를 표시할 곳 -->
         </div>
         <div class="buttons">
-            <button class="btn" onclick="confirmData()">확인</button>
-            <button class="btn" onclick="cancel()">나가기</button> <!-- 버튼 텍스트 변경 및 크기 확대 -->
+            <button class="btn2" onclick="confirmData()">확인</button>
+            <button class="btn2" onclick="cancel()">나가기</button> <!-- 버튼 텍스트 변경 및 크기 확대 -->
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
@@ -174,7 +200,7 @@
         function displayUserData(data) {
             const userDataElement = document.getElementById('user-data');
             userDataElement.innerHTML = `
-                <div>이름: ${data.name}</div>
+                <div>${data.name}</div>
             `;
         }
 

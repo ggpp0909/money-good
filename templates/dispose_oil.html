@@ -22,7 +22,8 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 90%;
-            max-width: 400px;
+            max-width: 600px;
+            height: 500px;
         }
         .message {
             text-align: center;
@@ -96,10 +97,22 @@
     </div>
 
     <script>
+        let oilAmount = 0;
+        let userInfo = getUrlParams(); // QR 코드에서 받은 사용자 정보를 저장할 객체
+
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                name: params.get('name'),
+                phone: params.get('phone'),
+                id: params.get('ID')
+            };
+        }
+
         function handleLidClose() {
             showLoading();
             setTimeout(() => {
-                const oilAmount = "X"; // 실제 로직으로 대체
+                oilAmount = 123; // 실제 로직으로 대체
                 document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
                 hideLoading();
                 document.getElementById('result-screen').classList.remove('hidden');
@@ -109,7 +122,7 @@
         function handleMeasureAgain() {
             showLoading();
             setTimeout(() => {
-                const oilAmount = "X"; // 실제 로직으로 대체
+                oilAmount = 234; // 실제 로직으로 대체
                 document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
                 hideLoading();
                 document.getElementById('result-screen').classList.remove('hidden');
@@ -120,13 +133,20 @@
             alert("확인합니다.");
             document.getElementById('result-screen').classList.add('hidden');
             showLoading();
-            setTimeout(() => {
-                // Ajax로 5월 누적 식용유 받아오기
-                const totalAmount = "X"; // 실제 로직으로 대체
-                document.getElementById('total-amount-message').textContent = `5월 누적 폐식용유는 ${totalAmount} (L)입니다.`;
-                hideLoading();
-                document.getElementById('history-screen').classList.remove('hidden');
-            }, 1000);
+            const currentMonth = new Date().getMonth() + 1; // 이번 달을 알아내기
+
+            fetch(`/save_to_excel?name=${userInfo.name}&phone=${userInfo.phone}&id=${userInfo.id}&amount=${oilAmount}`)
+                .then(response => response.json())
+                .then(data => {
+                    const totalAmount = data.totalAmount;
+                    document.getElementById('total-amount-message').textContent = `${currentMonth}월 누적 폐식용유는 ${totalAmount} (L)입니다.`;
+                    hideLoading();
+                    document.getElementById('history-screen').classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    hideLoading();
+                });
         }
 
         function showLoading() {
@@ -141,7 +161,12 @@
         }
 
         function redirectToHistory() {
-            window.location.href = "{{ url_for('history') }}";
+            navigateTo('/history');
+        }
+
+        function navigateTo(page) {
+            const queryString = `?name=${encodeURIComponent(userInfo.name)}&phone=${encodeURIComponent(userInfo.phone)}&ID=${encodeURIComponent(userInfo.id)}`;
+            window.location.href = page + queryString;
         }
 
         document.addEventListener('DOMContentLoaded', () => {

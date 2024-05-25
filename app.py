@@ -66,16 +66,24 @@ def fetch_history():
         wb = openpyxl.load_workbook(FILE_PATH)
         sheet = wb.active
         history = []
+        total_amount = 0
+        weekdays = ["월", "화", "수", "목", "금", "토", "일"]
+        
         for row in sheet.iter_rows(min_row=2, values_only=True):
             record_id, name, phone, oil_amount, place, record_time = row
-            if record_id == user_id and datetime.strptime(record_time, "%Y-%m-%d %H:%M:%S").month == month:
+            record_date = datetime.strptime(record_time, "%Y-%m-%d %H:%M:%S")
+            if record_id == user_id and record_date.month == month:
+                weekday_str = weekdays[record_date.weekday()]
+                formatted_date = record_date.strftime(f"%Y.%m.%d({weekday_str})")
                 history.append({
-                    "date": datetime.strptime(record_time, "%Y-%m-%d %H:%M:%S").strftime("%Y.%m.%d(%a)"),
+                    "date": formatted_date,
                     "amount": oil_amount
                 })
-        return jsonify(history)
+                total_amount += float(oil_amount)
+
+        return jsonify({"history": history, "total": total_amount})
     except FileNotFoundError:
-        return jsonify([])   
+        return jsonify({"history": [], "total": 0})
 
 @app.route('/history')
 def history():

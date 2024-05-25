@@ -210,7 +210,7 @@
 
         function confirmData() {
             if (scannedData) {
-                const queryString = `?name=${encodeURIComponent(scannedData.name)}&phone=${encodeURIComponent(scannedData.phone)}&ID=${encodeURIComponent(scannedData.ID)}`;
+                const queryString = `?name=${encodeURIComponent(scannedData.name)}&phone=${encodeURIComponent(scannedData.phone)}&id=${encodeURIComponent(scannedData.ID)}`;
                 window.location.href = "/main_menu" + queryString;
             } else {
                 alert("No data scanned.");

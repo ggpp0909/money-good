@@ -34,7 +34,7 @@ def qr_reader():
 def main_menu():
     name = request.args.get('name')
     phone = request.args.get('phone')
-    user_id = request.args.get('ID')
+    user_id = request.args.get('id')
     return render_template('main_menu.html', name=name, phone=phone, user_id=user_id)
 
 @app.route('/dispose_oil')
@@ -96,7 +96,7 @@ def process_qr():
     data = request.get_json()
     name = data.get('name')
     phone = data.get('phone')
-    cur_user = data.get('ID')
+    cur_user = data.get('id')
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     db = get_db()

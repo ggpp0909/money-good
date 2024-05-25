@@ -138,7 +138,7 @@
             return {
                 name: params.get('name'),
                 phone: params.get('phone'),
-                id: params.get('ID')
+                id: params.get('id')
             };
         }
 
@@ -198,7 +198,7 @@
         }
 
         function navigateTo(page) {
-            const queryString = `?name=${encodeURIComponent(userInfo.name)}&phone=${encodeURIComponent(userInfo.phone)}&ID=${encodeURIComponent(userInfo.id)}`;
+            const queryString = `?name=${encodeURIComponent(userInfo.name)}&phone=${encodeURIComponent(userInfo.phone)}&id=${encodeURIComponent(userInfo.id)}`;
             window.location.href = page + queryString;
         }
 

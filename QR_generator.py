@@ -5,7 +5,7 @@ import json
 data = {
     "name": "yeong nam",
     "phone": "+1234567890",
-    "ID" : "1234"
+    "id" : "1234"
 }
 
 # JSON 데이터를 문자열로 변환

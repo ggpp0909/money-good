@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            height: 90%;
+            max-height: 450px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 2.5rem;
+            color: #dddddd;
+        }
+        .arrow {
+            display: inline-block;
+            cursor: pointer;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            margin: 10px;
+            user-select: none;
+        }
+        .arrow.left {
+            border-right: 30px solid #dddddd; /* Left arrow */
+        }
+        .arrow.right {
+            border-left: 30px solid #dddddd; /* Right arrow */
+        }
+        .arrow.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .history-list {
+            display: flex;
+            align-items: center; /* Center items vertically */
+            justify-content: center; /* Center items horizontally */
+            font-weight: bold;
+            width: 100%;
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            user-select: none; /* Prevent text selection */
+            cursor: grab; /* Change cursor to indicate dragging */
+        }
+        .history-list::-webkit-scrollbar {
+            width: 12px; /* Width of the scrollbar */
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: transparent; /* Transparent background */
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background-color: #dddddd; /* Color of the scrollbar */
+            border-radius: 20px; /* Roundness of the scrollbar */
+            border: 3px solid transparent; /* Padding around scrollbar */
+        }
+        .history-list::-webkit-scrollbar-button {
+            display: none; /* Remove arrows */
+            width: 0;
+            height: 0;
+        }
+        .no-history {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #dddddd;
+            text-align: center;
+        }
+
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 2rem;
+            color: #dddddd;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc; /* Add border for separation */
+            padding-bottom: 10px; /* Add padding to separate the border from the content */
+        }
+        .btn {
+            border: 2px solid #c0e1d7;
+            background-color: #178765;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+            text-align: center;
+            width: 380px;
+            height: 100px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .total-liters {
+            font-weight: bold;
+            color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title" id="title"></div>
+            <div class="arrow left" onclick="changeMonth(-1)"></div>
+            <div class="arrow right" onclick="changeMonth(1)"></div>
+        </div>
+        <div class="total-liters" id="total-liters" style="align-self: flex-end; font-size: 1.5rem; margin-bottom: 20px;">
+            <!-- Total liters will be updated here -->
+        </div>
+        <div class="history-list" id="history-list">
+            <!-- 수거 기록이 여기에 표시됩니다 -->
+        </div>
+        <div class="history-list" id="history-list">
+            <!-- 수거 기록이 여기에 표시됩니다 -->
+            <div class="no-history" id="no-history">수거 내역 없음</div>
+        </div>
+        <div class="button-container">
+            <button class="btn" onclick="navigateTo('/dispose_oil')">폐식용유 버리기</button>
+            <button class="btn" onclick="window.location.href='/'">나가기 (로그아웃)</button>
+        </div>
+    </div>
+
+    <script>
+        const params = getUrlParams();
+        let currentDate = new Date();
+        let maxDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTitle();
+            fetchHistory();
+            updateArrows();
+        });
+
+        // URL 파라미터 읽기
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                name: params.get('name'),
+                phone: params.get('phone'),
+                id: params.get('id')
+            };
+        }
+
+        // 페이지 이동
+        function navigateTo(page) {
+            const queryString = `?name=${encodeURIComponent(params.name)}&phone=${encodeURIComponent(params.phone)}&id=${encodeURIComponent(params.id)}`;
+            window.location.href = page + queryString;
+        }
+
+        function updateTitle() {
+            const month = currentDate.getMonth() + 1; // 월은 0부터 시작하므로 +1
+            const year = currentDate.getFullYear().toString().slice(-2);
+            const title = `${params.name} 님의 ${year}년 ${month}월 수거 내역`;
+            document.getElementById('title').textContent = title;
+        }
+
+        function updateArrows() {
+            const leftArrow = document.querySelector('.arrow.left');
+            const rightArrow = document.querySelector('.arrow.right');
+            // Disable the left arrow if the month is January of the current year
+            if (currentDate.getFullYear() === maxDate.getFullYear() && currentDate.getMonth() <= 0) {
+                leftArrow.classList.add('disabled');
+            } else {
+                leftArrow.classList.remove('disabled');
+            }
+            // Disable the right arrow if the month is the current month or future
+            if (currentDate.getFullYear() >= maxDate.getFullYear() && currentDate.getMonth() >= maxDate.getMonth()) {
+                rightArrow.classList.add('disabled');
+            } else {
+                rightArrow.classList.remove('disabled');
+            }
+        }
+
+        function changeMonth(offset) {
+            const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + offset);
+            if (newDate <= maxDate) {
+                currentDate = newDate;
+                updateTitle();
+                fetchHistory();
+                updateArrows();
+            }
+        }
+
+        function fetchHistory() {
+            const queryString = `?id=${encodeURIComponent(params.id)}&year=${currentDate.getFullYear()}&month=${currentDate.getMonth() + 1}`;
+            fetch(`/fetch_history${queryString}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayHistory(data.history);
+                    document.getElementById('total-liters').textContent = `총 ${data.total} L`;
+                })
+                .catch(error => {
+                    console.error('Error fetching history:', error);
+                });
+        }
+        function displayHistory(historyList) {
+            const historyContainer = document.getElementById('history-list');
+            const noHistoryMessage = document.getElementById('no-history');
+            historyContainer.innerHTML = '';
+
+            if (historyList.length === 0) {
+                noHistoryMessage.style.display = 'block';
+                historyContainer.style.display = 'none';
+            } else {
+                noHistoryMessage.style.display = 'none';
+                historyContainer.style.display = 'block';
+                historyList.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `<div>${item.date}</div><div>${item.amount} L</div>`;
+                    historyContainer.appendChild(historyItem);
+                });
+            }
+        }
+
+
+        // 드래그로 스크롤 기능 추가
+        let isDown = false;
+        let startY;
+        let scrollTop;
+
+        const slider = document.querySelector('.history-list');
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.classList.add('active');
+            slider.style.cursor = 'grabbing'; // Change cursor to grabbing
+            startY = e.pageY - slider.offsetTop;
+            scrollTop = slider.scrollTop;
+            e.preventDefault(); // Prevent text selection
+        });
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.classList.remove('active');
+            slider.style.cursor = 'grab'; // Change cursor back to grab
+        });
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.classList.remove('active');
+            slider.style.cursor = 'grab'; // Change cursor back to grab
+        });
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const y = e.pageY - slider.offsetTop;
+            const walk = (y - startY) * 2; // 스크롤 속도
+            slider.scrollTop = scrollTop - walk;
+        });
+    </script>
+</body>
+</html>

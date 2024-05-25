@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OIL COLLECTOR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            height: 300px;
+        }
+        .message {
+            margin-top: 40px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #dddddd;
+        }
+        .btn {
+            background-color: #178765;
+            color: white;
+            font-size: 2.5rem; /* 버튼 글자 크기 확대 */
+            font-weight: bold;
+            padding: 30px 220px; /* 버튼 크기 확대 */
+            width: 100%;
+            border: 2px solid #c0e1d7;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 30px 0; /* 마진 추가 */
+        }
+        .btn2 {
+            background-color: #178765;
+            color: white;
+            font-size: 1.5rem; /* 버튼 글자 크기 확대 */
+            font-weight: bold;
+            width: 400px;
+            padding: 30px 50px; /* 버튼 크기 확대 */
+            border: 2px solid #c0e1d7;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 30px 0; /* 마진 추가 */
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #dddddd;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="initial-screen" class="container">
+        <div class="message">
+            <div>열린 투입구로</div>
+            <div>폐식용유를 부어주세요.</div>
+        </div>
+        <button class="btn" onclick="handleLidClose()">투입구 닫기</button>
+    </div>
+
+    <div id="result-screen" class="container hidden">
+        <div class="message" id="oil-amount-message"></div>
+        <div class="buttons">
+            <button class="btn2" onclick="handleMeasureAgain()">다시 측정</button>
+            <button class="btn2" onclick="handleConfirm()">확인</button>
+        </div>
+    </div>
+
+    <div id="history-screen" class="container hidden">
+        <div class="message" id="total-amount-message"></div>
+        <div class="buttons">
+            <button class="btn2" onclick="redirectToHistory()">수거내역 확인하기</button>
+            <button class="btn2" onclick="window.location.href='/'">나가기(로그아웃)</button>
+        </div>
+    </div>
+
+    <div id="loading-screen" class="container hidden">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        let oilAmount = 0;
+        let userInfo = getUrlParams(); // QR 코드에서 받은 사용자 정보를 저장할 객체
+
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                name: params.get('name'),
+                phone: params.get('phone'),
+                id: params.get('id')
+            };
+        }
+
+        function handleLidClose() {
+            showLoading();
+            setTimeout(() => {
+                oilAmount = 123; // 실제 로직으로 대체
+                document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
+                hideLoading();
+                document.getElementById('result-screen').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function handleMeasureAgain() {
+            showLoading();
+            setTimeout(() => {
+                oilAmount = 234; // 실제 로직으로 대체
+                document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
+                hideLoading();
+                document.getElementById('result-screen').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function handleConfirm() {
+            document.getElementById('result-screen').classList.add('hidden');
+            showLoading();
+            const currentMonth = new Date().getMonth() + 1; // 이번 달을 알아내기
+
+            fetch(`/save_to_excel?name=${userInfo.name}&phone=${userInfo.phone}&id=${userInfo.id}&amount=${oilAmount}`)
+                .then(response => response.json())
+                .then(data => {
+                    const totalAmount = data.totalAmount;
+                    document.getElementById('total-amount-message').textContent = `${currentMonth}월 누적 폐식용유는 ${totalAmount} (L)입니다.`;
+                    hideLoading();
+                    document.getElementById('history-screen').classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    hideLoading();
+                });
+        }
+
+        function showLoading() {
+            document.getElementById('loading-screen').classList.remove('hidden');
+            document.getElementById('initial-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('history-screen').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-screen').classList.add('hidden');
+        }
+
+        function redirectToHistory() {
+            navigateTo('/history');
+        }
+
+        function navigateTo(page) {
+            const queryString = `?name=${encodeURIComponent(userInfo.name)}&phone=${encodeURIComponent(userInfo.phone)}&id=${encodeURIComponent(userInfo.id)}`;
+            window.location.href = page + queryString;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('initial-screen').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>

@@ -3,11 +3,19 @@ from excel import append_to_excel, calculate_total_monthly_amount
 import sqlite3
 from datetime import datetime
 import openpyxl
+import serial
+import actuator
 
 app = Flask(__name__)
 DATABASE = 'database.db'
 FILE_PATH = 'data.xlsx'
 cur_user = None
+arduino_port = actuator.find_arduino_port()
+
+ser = serial.Serial(arduino_port, 9600)
+if arduino_port is None:
+    print("Could not find an Arduino connected to the computer.")
+    # exit()
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -37,12 +45,62 @@ def main_menu():
     user_id = request.args.get('id')
     return render_template('main_menu.html', name=name, phone=phone, user_id=user_id)
 
+
 @app.route('/dispose_oil')
 def dispose_oil():
     name = request.args.get('name')
     phone = request.args.get('phone')
     user_id = request.args.get('id')
     return render_template('dispose_oil.html', name=name, phone=phone, user_id=user_id)
+
+# 1. 폐식용유 버리기 -> 투입구 문열어야해
+@app.route('/open_lid')
+def open_lid():
+    try:
+        # 아두이노로 O보내서 열고 투입구 열기
+        # actuator.send_command(ser, 'O', 3)
+        return jsonify({'status': 'success'})
+    except:
+        return jsonify({'status': 'fail'})
+    finally:
+        ser.close()
+
+# 2. 투입구 닫기 -> 투입구 닫고 무게 재서 리턴해야해
+@app.route('/close_lid')
+def close_lid():
+    try:
+        # 아두이노로 C보내서 열고 투입구 닫고 무게재서 리턴
+        # weight = actuator.send_command(ser, 'C', 3)
+        return jsonify({'status': 'success', 'weight': 1234})
+    except:
+        return jsonify({'status': 'fail'})
+    finally:
+        ser.close()
+
+# 3. 다시재기 -> 닫힌상태 그대로 무게재서 리턴
+@app.route('/calc_weight_again')
+def calc_weight_again():
+    try:
+        # 아두이노로 R보내서 무게재서 리턴
+        # weight = actuator.send_command(ser, 'R', 3)
+        return jsonify({'status': 'success', 'weight': 1234})
+    except:
+        return jsonify({'status': 'fail'})
+    finally:
+        ser.close()
+
+
+# 4. 마지막 확인 -> 아래 오일통으로 떨구기 (밑에 모터 열었다 기다렸다 닫기)
+@app.route('/store_oil')
+def store_oil():
+    try:
+        # 아두이노로 M보내서 아랫 모터 열고닫기
+        # actuator.send_command(ser, 'M', 3)
+        return jsonify({'status': 'success'})
+    except:
+        return jsonify({'status': 'fail'})
+    finally:
+        ser.close()
 
 @app.route('/save_to_excel')
 def save_to_excel():

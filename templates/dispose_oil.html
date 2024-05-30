@@ -95,7 +95,7 @@
             <div>열린 투입구로</div>
             <div>폐식용유를 부어주세요.</div>
         </div>
-        <button class="btn" onclick="handleLidClose()">투입구 닫기</button>
+        <button class="btn" onclick="handleCloseButton()">투입구 닫기</button>
     </div>
 
     <div id="result-screen" class="container hidden">
@@ -123,6 +123,16 @@
     <script>
         let oilAmount = 0;
         let userInfo = getUrlParams(); // QR 코드에서 받은 사용자 정보를 저장할 객체
+        openLid()
+        
+        function openLid() {
+            fetch('open_lid')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                })
+                .catch(error => console.error('Error:', error));
+        }
 
         function getUrlParams() {
             const params = new URLSearchParams(window.location.search);
@@ -133,25 +143,42 @@
             };
         }
 
-        function handleLidClose() {
+        function handleCloseButton() {
             showLoading();
-            setTimeout(() => {
-                oilAmount = 123; // 실제 로직으로 대체
-                document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
-                hideLoading();
-                document.getElementById('result-screen').classList.remove('hidden');
-            }, 1000);
+            fetch('close_lid')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    if (data.status == 'success') {
+                        oilAmount = data.weight;
+                        document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
+                        hideLoading();
+                        document.getElementById('result-screen').classList.remove('hidden');
+                    } else {
+
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         function handleMeasureAgain() {
             showLoading();
-            setTimeout(() => {
-                oilAmount = 234; // 실제 로직으로 대체
-                document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
-                hideLoading();
-                document.getElementById('result-screen').classList.remove('hidden');
-            }, 1000);
+            fetch('calc_weight_again')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    if (data.status == 'success') {
+                        oilAmount = data.weight;
+                        document.getElementById('oil-amount-message').textContent = `현재 측정된 폐식용유는 ${oilAmount} (L)입니다.`;
+                        hideLoading();
+                        document.getElementById('result-screen').classList.remove('hidden');
+                    } else {
+
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
+    
 
         function handleConfirm() {
             document.getElementById('result-screen').classList.add('hidden');
@@ -170,6 +197,14 @@
                     console.error('Error:', error);
                     hideLoading();
                 });
+            
+            
+            fetch('store_oil')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         function showLoading() {

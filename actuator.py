@@ -12,7 +12,7 @@ def find_arduino_port():
 
 # Function to send a command to the Arduino and wait for a response
 def send_command(ser, command, delay):
-    ser.write(command.encode())
+    # ser.write(command.encode())
     time.sleep(delay)
     if command == 'O':
         weight = 990
@@ -21,13 +21,13 @@ def send_command(ser, command, delay):
         return weight
 
 # Main script
-arduino_port = find_arduino_port()
-if arduino_port is None:
-    print("Could not find an Arduino connected to the computer.")
-    exit()
+# arduino_port = find_arduino_port()
+# if arduino_port is None:
+#     print("Could not find an Arduino connected to the computer.")
+#     exit()
 
-ser = serial.Serial(arduino_port, 9600)
-time.sleep(2)  # Wait for the serial connection to establish
+# ser = serial.Serial(arduino_port, 9600)
+# time.sleep(2)  # Wait for the serial connection to establish
 
 # try:
 #     # Step 1: Open the door and measure weight

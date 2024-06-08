@@ -17,6 +17,7 @@ bool isWeightMeasured = false;
 
 HX711 scale;
 float scale_factor = 372000;  //Calibrated value
+float weight;
 
 void setup() 
 {
@@ -46,7 +47,7 @@ void stop_door()
   digitalWrite(IN3,LOW);
   digitalWrite(IN4,LOW);
   
-  Serial.println("Stop");  
+  // Serial.println("Stop");  
 }
 
 void move_forward()
@@ -89,8 +90,8 @@ void move_forward()
       digitalWrite(IN2, LOW);
       digitalWrite(IN3, LOW);
       digitalWrite(IN4, LOW);
-      Serial.println("Forward cnt:");
-      Serial.println(fwdcnt);
+      // Serial.println("Forward cnt:");
+      // Serial.println(fwdcnt);
       fwdcnt = 0;
 
     }
@@ -105,8 +106,8 @@ void move_forward()
         digitalWrite(IN2, LOW);
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, LOW);
-        Serial.println("Forward cnt:");
-        Serial.println(fwdcnt);
+        // Serial.println("Forward cnt:");
+        // Serial.println(fwdcnt);
         fwdcnt = 0;
       }
     }
@@ -152,8 +153,8 @@ void move_backward()
       digitalWrite(IN2, LOW);
       digitalWrite(IN3, LOW);
       digitalWrite(IN4, LOW);
-      Serial.println("Backward count:");
-      Serial.println(bwdcnt);
+      // Serial.println("Backward count:");
+      // Serial.println(bwdcnt);
       bwdcnt = 0;
 
     }
@@ -168,8 +169,8 @@ void move_backward()
         digitalWrite(IN2, LOW);
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, LOW);
-        Serial.println("Backward count:");
-        Serial.println(bwdcnt);
+        // Serial.println("Backward count:");
+        // Serial.println(bwdcnt);
         bwdcnt = 0;
       }
     }
@@ -180,16 +181,17 @@ void measures_weight()
 {
   while(isWeightMeasured)
   {
-    float weight = scale.get_units(3);
+    weight = scale.get_units(3);
     scale.set_scale(scale_factor);
+    // Serial.print("Sending weight info: ");
+    weight = weight*1000;
+    Serial.print(weight);
+    delay(100);
 
-    Serial.print("Sending weight info: ");
-    Serial.println(weight,3);
-
-    if (Serial.available())
-    {
-      break;
-    }
+    // if (Serial.available())
+    // {
+    //   break;
+    // }
   }
 }
 
@@ -203,9 +205,8 @@ void loop()
     {  
       // Open door
       isDoorOpened = true;
-      Serial.println("Open the door");
+      // Serial.println("Open the door");
       move_forward();
-      
       // Measure weight
       isWeightMeasured = true;
       measures_weight();
@@ -215,13 +216,16 @@ void loop()
     {  
       // Close door
       isDoorClosed = true;
-      isWeightMeasured = false;
-      Serial.println("Close the door");
       move_backward();
+
+      isWeightMeasured = true;
+      measures_weight();
+
       
     }
     else if (command == 'M') 
     {  // Start 220V AC Motor
+      isWeightMeasured = false;
       digitalWrite(relayPin, HIGH);
       delay(5000); // Adjust based on operation time
       digitalWrite(relayPin, LOW);

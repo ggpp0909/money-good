@@ -10,9 +10,13 @@ def find_arduino_port():
             return port.device
     return None
 
+# arduino_port = find_arduino_port()
+# ser = serial.Serial(arduino_port, 9600)
+# ser.close()
+
 # Function to send a command to the Arduino and wait for a response
 def send_command(ser, command):
-    # ser.write(command.encode())
+    ser.write(command.encode())
     # time.sleep(delay)
     if command == 'O':
         # weight = 990
@@ -20,6 +24,8 @@ def send_command(ser, command):
         print(f"Measured weight: {weight} grams")
         return weight
 
+# send_command(ser,'M')
+# ser.close()
 # Main script
 # arduino_port = find_arduino_port()
 # if arduino_port is None:

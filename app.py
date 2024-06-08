@@ -1,3 +1,4 @@
+import time
 from flask import Flask, render_template, redirect, url_for, request, jsonify, g
 from excel import append_to_excel, calculate_total_monthly_amount
 import sqlite3
@@ -102,6 +103,24 @@ def store_oil():
     finally:
         ser.close()
 
+@app.route('/start_emptying')
+def start_emptying():
+    # 아두이노와 통신하는 코드 추가
+    # 여기서 아두이노로 신호를 보내고 응답을 받는 로직을 구현합니다.
+    try:
+        # 아두이노에 신호를 보내고 응답을 기다립니다.
+        time.sleep(3)
+        return jsonify({'status': 'success'})
+    except:
+        return jsonify({'status': 'fail'})
+    finally:
+        ser.close()
+
+
+@app.route('/password')
+def password():
+    return render_template('password.html')
+
 @app.route('/save_to_excel')
 def save_to_excel():
     name = request.args.get('name')
@@ -149,11 +168,6 @@ def history():
     phone = request.args.get('phone')
     user_id = request.args.get('id')
     return render_template('history.html', name=name, phone=phone, user_id=user_id)
-
-@app.route('/view_records')
-def view_records():
-    # 처리 로직을 여기에 추가하세요.
-    return "수거내역 확인하기 페이지"
 
 @app.route('/process_qr', methods=['POST'])
 def process_qr():

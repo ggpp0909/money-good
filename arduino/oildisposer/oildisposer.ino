@@ -188,10 +188,10 @@ void measures_weight()
     Serial.print(weight);
     delay(100);
 
-    // if (Serial.available())
-    // {
-    //   break;
-    // }
+    if (Serial.available())
+    {
+      break;
+    }
   }
 }
 
@@ -227,7 +227,7 @@ void loop()
     {  // Start 220V AC Motor
       isWeightMeasured = false;
       digitalWrite(relayPin, HIGH);
-      delay(5000); // Adjust based on operation time
+      delay(4000); // Adjust based on operation time
       digitalWrite(relayPin, LOW);
     }
     else if (command == 'R') 

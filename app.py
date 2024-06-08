@@ -59,8 +59,8 @@ def dispose_oil():
 def open_lid():
     try:
         # 아두이노로 O보내서 열고 투입구 열기
-        # actuator.send_command(ser, 'O', 3)
-        return jsonify({'status': 'success'})
+        weight = actuator.send_command(ser, 'O')
+        return jsonify({'status': 'success', 'weight': weight})
     except:
         return jsonify({'status': 'fail'})
     finally:
@@ -71,8 +71,8 @@ def open_lid():
 def close_lid():
     try:
         # 아두이노로 C보내서 열고 투입구 닫고 무게재서 리턴
-        # weight = actuator.send_command(ser, 'C', 3)
-        return jsonify({'status': 'success', 'weight': 1234})
+        actuator.send_command(ser, 'C')
+        return jsonify({'status': 'success'})
     except:
         return jsonify({'status': 'fail'})
     finally:
@@ -83,11 +83,12 @@ def close_lid():
 def calc_weight_again():
     try:
         # 아두이노로 R보내서 무게재서 리턴
-        # weight = actuator.send_command(ser, 'R', 3)
-        return jsonify({'status': 'success', 'weight': 1234})
+        weight = actuator.send_command(ser, 'R')
+        return jsonify({'status': 'success', 'weight': weight})
     except:
         return jsonify({'status': 'fail'})
     finally:
+        actuator.send_command(ser,'D')
         ser.close()
 
 

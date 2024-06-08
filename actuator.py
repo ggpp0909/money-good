@@ -11,12 +11,12 @@ def find_arduino_port():
     return None
 
 # Function to send a command to the Arduino and wait for a response
-def send_command(ser, command, delay):
+def send_command(ser, command):
     # ser.write(command.encode())
-    time.sleep(delay)
+    # time.sleep(delay)
     if command == 'O':
-        weight = 990
-        # weight = ser.readline().strip().decode()
+        # weight = 990
+        weight = ser.readline().strip().decode()
         print(f"Measured weight: {weight} grams")
         return weight
 

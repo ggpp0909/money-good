@@ -12,11 +12,27 @@
         .text-block-2 {
             font-weight: bold;
         }
+        .empty-oil-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #178765;
+            color: #dddddd;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: 1px solid #dddddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 1000;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
-            document.body.addEventListener('click', () => {
-                window.location.href = "{{ url_for('qr_reader') }}";
+            document.body.addEventListener('click', (event) => {
+                if (!event.target.classList.contains('empty-oil-button')) {
+                    window.location.href = "{{ url_for('qr_reader') }}";
+                }
             });
         });
     </script>
@@ -32,5 +48,6 @@
             <div>터치해주세요</div>
         </div>
     </div>
+    <button class="empty-oil-button" onclick="window.location.href='/password'">폐유통 비우기</button>
 </body>
 </html>

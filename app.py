@@ -34,25 +34,14 @@ response_message = None
 def handle_message(msg):
     global response_message
     try:
-        # print(f"This is msg: {msg}")
-        # value = msg.decode('utf-8').replace('\n', '')
         float_value = float(msg.decode())
-        # int_value = int(value)
-        # print(f"This is int_value: {int_value}")
         if isinstance(float_value, float):
             response_message = float_value
             print(f"This is value:{response_message}")
-    # print(response_message)
+    
     except ValueError:
         print("Received message is not a valid float")
 
-
-# @serial.on_message()
-# def handle_message(msg):
-#     global response_message
-#     text = msg.decode('utf-8').replace('\n', '')
-#     response_message = text
-#     print(response_message)
 
 @app.route('/')
 def index():
@@ -76,30 +65,9 @@ def dispose_oil():
     user_id = request.args.get('id')
     return render_template('dispose_oil.html', name=name, phone=phone, user_id=user_id)
 
-# @app.route('/open_lid')
-# def open_lid():
-#     global response_message
-#     response_message = None  # Reset response message
-#     try:
-#         serial.on_send('O')
-        
-#         # Wait for response
-#         timeout = 5  # seconds
-#         start_time = time.time()
-#         while response_message is None and (time.time() - start_time) < timeout:
-#             time.sleep(0.1)
-        
-#         if response_message:
-#             return jsonify({'status': 'success', 'weight': response_message})
-#         else:
-#             return jsonify({'status': 'fail', 'error': 'No response within timeout period'})
-#     except Exception as e:
-#         print(f"Error opening lid: {e}")
-#         return jsonify({'status': 'fail', 'error': str(e)})
 @app.route('/open_lid')
 def open_lid():
     global response_message
-    # response_message = None  # Reset response message
     try:
         serial.on_send('O')
         
@@ -124,23 +92,17 @@ def open_lid():
 @app.route('/close_lid')
 def close_lid():
     global response_message
-    # response_message = None  # Reset response message
     try:
         serial.on_send('C')
         
         # Wait for response
         timeout = 20  # seconds
         start_time = time.time()
-        # while response_message is None and (time.time() - start_time) < timeout:
-        #     time.sleep(0.1)
+
         if isinstance(response_message, float):
             return jsonify({'status': 'success', 'weight': response_message})
         if (time.time() - start_time) >= timeout:
             return jsonify({'status': 'fail', 'error': 'No response within timeout period'})
-        # if response_message:
-        #     return jsonify({'status': 'success', 'weight': response_message})
-        # else:
-        #     return jsonify({'status': 'fail', 'error': 'No response within timeout period'})
     except Exception as e:
         print(f"Error closing lid: {e}")
         return jsonify({'status': 'fail', 'error': str(e)})
@@ -148,19 +110,16 @@ def close_lid():
 @app.route('/calc_weight_again')
 def calc_weight_again():
     global response_message
-    response_message = None  # Reset response message
     try:
         serial.on_send('R')
         
         # Wait for response
         timeout = 5  # seconds
         start_time = time.time()
-        while response_message is None and (time.time() - start_time) < timeout:
-            time.sleep(0.1)
         
-        if response_message:
+        if isinstance(response_message, float):
             return jsonify({'status': 'success', 'weight': response_message})
-        else:
+        if (time.time() - start_time) >= timeout:
             return jsonify({'status': 'fail', 'error': 'No response within timeout period'})
     except Exception as e:
         print(f"Error calculating weight again: {e}")
@@ -207,7 +166,7 @@ def save_to_excel():
     name = request.args.get('name')
     phone = request.args.get('phone')
     user_id = request.args.get('id')
-    oil_amount = request.args.get('weight')
+    oil_amount = request.args.get('amount')
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     place = "Unknown"
 

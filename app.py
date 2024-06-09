@@ -72,7 +72,7 @@ def open_lid():
         serial.on_send('O')
         
         # Wait for response
-        timeout = 5  # seconds
+        timeout = 1000  # seconds
         start_time = time.time()
         while True:
             # Check if response_message is an float
@@ -96,7 +96,7 @@ def close_lid():
         serial.on_send('C')
         
         # Wait for response
-        timeout = 20  # seconds
+        timeout = 1000  # seconds
         start_time = time.time()
 
         if isinstance(response_message, float):
@@ -114,7 +114,7 @@ def calc_weight_again():
         serial.on_send('R')
         
         # Wait for response
-        timeout = 5  # seconds
+        timeout = 100  # seconds
         start_time = time.time()
         
         if isinstance(response_message, float):

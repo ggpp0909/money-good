@@ -1,9 +1,11 @@
 int RELAY1 = 7;
+// int RELAY1 = 8;
 
 
 void setup() {
   Serial.begin(9600);// put your setup code here, to run once:
   pinMode(RELAY1,OUTPUT);
+  digitalWrite(RELAY1,HIGH);  // EnableA를 점퍼 핀 연결한 환경과 동일하게
 
 }
 

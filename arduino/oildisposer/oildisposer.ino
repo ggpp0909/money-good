@@ -8,7 +8,10 @@ const int ENA = 9;
 const int ENB = 10;  
 const int LOADCELL_DOUT_PIN = 5;
 const int LOADCELL_SCK_PIN = 6;
-const int relayPin = 7;
+const int relayPinM = 7;
+const int relayPinS = 8;
+const int SMotorTime = 10000; //10 sec
+const int BMotorTime = 60000; //60 sec
 
 bool isDoorOpened = false;
 bool isDoorClosed = false;
@@ -27,7 +30,10 @@ void setup()
   pinMode(IN4,OUTPUT);
   pinMode(ENA,OUTPUT);    
   pinMode(ENB,OUTPUT);
-  pinMode(relayPin, OUTPUT);
+  pinMode(relayPinM, OUTPUT);
+  pinMode(relayPinS, OUTPUT);
+  digitalWrite(relayPinM,HIGH);  // EnableA를 점퍼 핀 연결한 환경과 동일하게
+  digitalWrite(relayPinS,HIGH);  // EnableA를 점퍼 핀 연결한 환경과 동일하게
   digitalWrite(ENA,HIGH);  // EnableA를 점퍼 핀 연결한 환경과 동일하게
   digitalWrite(ENB,HIGH);  //EnableB를 점퍼 핀 연결한 환경과 동일하게
   analogWrite(ENA, 250);    //0~255 값으로 속도를 조절하고자 할 때
@@ -224,11 +230,20 @@ void loop()
       
     }
     else if (command == 'M') 
-    {  // Start 220V AC Motor
+    {  // Start Small Motor
       isWeightMeasured = false;
-      digitalWrite(relayPin, HIGH);
-      delay(4000); // Adjust based on operation time
-      digitalWrite(relayPin, LOW);
+      digitalWrite(relayPinM, LOW);
+      delay(SMotorTime); // Adjust based on operation time
+      digitalWrite(relayPinM, HIGH);
+    }
+    else if (command == 'S') 
+    {  // Start Big Motor 
+      float response  = 1; 
+      Serial.print(response);
+      isWeightMeasured = false;
+      digitalWrite(relayPinS, LOW);
+      delay(BMotorTime); // Adjust based on operation time
+      digitalWrite(relayPinS, HIGH);
     }
     else if (command == 'R') 
     {  

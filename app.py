@@ -129,30 +129,28 @@ def calc_weight_again():
 
 @app.route('/store_oil')
 def store_oil():
-    global response_message
-    response_message = None  # Reset response message
     try:
         serial.on_send('M')
         
-        if response_message:
-            return jsonify({'status': 'success'})
-        else:
-            return jsonify({'status': 'fail'})
+        # if response_message:
+        return jsonify({'status': 'success'})
+        # else:
+        # return jsonify({'status': 'fail'})
     except Exception as e:
         print(f"Error storing oil: {e}")
         return jsonify({'status': 'fail', 'error': str(e)})
 
 @app.route('/start_emptying')
 def start_emptying():
-    global response_message
-    response_message = None  # Reset response message
     try:
+        global response_message
+        # response_message = None  # Reset response message
         serial.on_send('S')
         
-        if response_message:
-            return jsonify({'status': 'success'})
-        else:
-            return jsonify({'status': 'fail'})
+        # if response_message:
+        return jsonify({'status': 'success'})
+        # else:
+        #     return jsonify({'status': 'fail'})
     except Exception as e:
         print(f"Error starting emptying process: {e}")
         return jsonify({'status': 'fail', 'error': str(e)})

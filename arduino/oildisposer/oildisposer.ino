@@ -10,8 +10,8 @@ const int LOADCELL_DOUT_PIN = 5;
 const int LOADCELL_SCK_PIN = 6;
 const int relayPinM = 7;
 const int relayPinS = 8;
-const int SMotorTime = 10000; //10 sec
-const int BMotorTime = 60000; //60 sec
+unsigned long SMotorTime = 10000; //10 sec
+unsigned long BMotorTime = 60000; //60 sec
 
 bool isDoorOpened = false;
 bool isDoorClosed = false;

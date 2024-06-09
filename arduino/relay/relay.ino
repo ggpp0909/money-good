@@ -1,5 +1,5 @@
-int RELAY1 = 7;
-// int RELAY1 = 8;
+// int RELAY1 = 7;
+int RELAY1 = 8;
 
 
 void setup() {
@@ -22,6 +22,10 @@ void loop() {
     {
       digitalWrite(RELAY1,LOW);
       Serial.println("Motor On");
+      delay(60000);
+      Serial.println("Motor off");
+      digitalWrite(RELAY1,HIGH);
+
     }
   }
 }

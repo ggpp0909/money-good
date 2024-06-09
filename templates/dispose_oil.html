@@ -189,7 +189,7 @@
                 .then(response => response.json())
                 .then(data => {
                     const totalAmount = data.totalAmount;
-                    document.getElementById('total-amount-message').textContent = `${currentMonth}월 누적 폐식용유는 ${totalAmount} (L)입니다.`;
+                    document.getElementById('total-amount-message').textContent = `${currentMonth}월 누적 폐식용유는 ${totalAmount} (g)입니다.`;
                     hideLoading();
                     document.getElementById('history-screen').classList.remove('hidden');
                 })

@@ -224,7 +224,7 @@ def process_qr():
     return jsonify({'status': 'success', 'message': 'User data saved.'})
 
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
 
 # import time
 # from flask import Flask, render_template, request, jsonify
